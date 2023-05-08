@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Bonson W. <bonson.ym@gmail.com>"]
 license = "MIT"
-description = "A Wave Function Collapse solver using preliminary voxel files. Only XRAW files exported from MagicaVoxel is currently supported. Results from the solver can be mapped to anything."
+description = "A Wave Function Collapse solver using preliminary voxel files. Only XRAW files exported from MagicaVoxel is currently supported."
+repository = "https://github.com/BonsonW/wfc_voxel"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
