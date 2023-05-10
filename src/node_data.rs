@@ -45,22 +45,28 @@ impl NodeData {
     }
     
     /// A bit mask in the length of all `Node`s.
-    pub fn bit_mask(&self) -> BitVec {
-        self.bit_mask.clone()
+    pub fn bit_mask(&self) -> &BitVec {
+        &self.bit_mask
     }
     
     /// The rotation of a `Node`.
-    pub fn get_rotation(&self, node_id: &usize) -> u8 {
-        self.node_dict[node_id].rotation
+    pub fn get_rotation(&self, node_id: &usize) -> Option<u8> {
+        if let Some(node) = self.node_dict.get(node_id) {
+            return Some(node.rotation);
+        }
+        None
     }
     
     /// The name of the asset a `Node` represents.
-    pub fn get_asset_name(&self, node_id: &usize) -> &String {
-        &self.node_dict[node_id].asset_name
+    pub fn get_asset_name(&self, node_id: &usize) -> Option<&String> {
+        if let Some(node) = self.node_dict.get(node_id) {
+            return Some(&node.asset_name);
+        }
+        None
     }
     
     /// The bit mask for all the `Node`s of a specific asset.
-    pub fn asset_bits(&self, asset: &String) -> Option<BitVec> {
-        self.asset_bits.get(asset).cloned()
+    pub fn asset_bits(&self, asset: &String) -> Option<&BitVec> {
+        self.asset_bits.get(asset)
     }
 }
