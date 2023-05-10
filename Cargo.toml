@@ -1,6 +1,6 @@
 [package]
 name = "wfc_voxel"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Bonson W. <bonson.ym@gmail.com>"]
 license = "MIT"
