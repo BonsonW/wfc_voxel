@@ -3,4 +3,4 @@ This crate provides a solver for tile-based Wave Function Collapse. It automatic
 Currently, the crate only supports `x-raw` file formats.
 
 See [Isometric Demo](https://github.com/BonsonW/wfc_voxel) for example code.
-![Preview](https://github.com/BonsonW/wfc_voxel/blob/main/assets/preview.gif)
+![Preview](https://github.com/BonsonW/wfc_voxel/blob/master/assets/preview.gif)
