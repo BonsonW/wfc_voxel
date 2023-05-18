@@ -67,17 +67,12 @@ impl Solver {
         &mut self.data[*pos]
     }
     
-    /// Automatically solves the current map state. Returns the solved map.
-    pub fn solve(&mut self) -> Array3<usize> {
+    /// Automatically solves the current map state.
+    /// Returns the solved map if successful. Returns `None` if not.
+    pub fn solve(&mut self) -> Option<Array3<usize>> {
         let mut ret = Array3::zeros(self.shape);
 
-        let mut h = 0;
         while !self.collapsed() {
-            if h > 9999 {
-                println!("wfc took too long");
-                return ret;
-            }
-            h += 1;
             self.iterate();
         }
 
@@ -85,8 +80,8 @@ impl Solver {
             for y in 0..self.shape[1] {
                 for z in 0..self.shape[2] {
                     if self.options_at(&[x, y, z]).not_any() {
-                        println!("unsolvable seed given");
-                        return ret;
+                        // seed not solvable
+                        return None;
                     } else {
                         ret[[x, y, z]] = self.options_at(&[x, y, z]).first_one().unwrap();
                     }
@@ -94,7 +89,7 @@ impl Solver {
             }
         }
 
-        ret
+        Some(ret)
     }
 
     #[inline]
