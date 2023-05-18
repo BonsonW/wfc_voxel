@@ -18,8 +18,8 @@ impl NodeData {
     /// Creates a new `NodeData` instance given the directory to all voxel files. A `Node` is generated for each voxel file rotation around the `Y` axis.
     /// `node_size` is the array length of each voxel file. This should be uniform across dimensions and voxel files.
     /// `exclusions` are the list of assets that you don't want connected.
-    pub fn new (node_size: usize, directory: String, exclusions: HashMap<&str, HashSet<&str>>) -> NodeData {
-        let node_dict = voxel::node_dict_from(&directory, [node_size, node_size, node_size], &exclusions);
+    pub fn new(node_size: usize, directory: String, exclusions: HashMap<&str, HashSet<&str>>) -> NodeData {
+        let node_dict = voxel::node_dict_from_directory(&directory, [node_size, node_size, node_size], &exclusions);
         
         let mut asset_bits = HashMap::new();
         let mut bit_mask = BitVec::new();

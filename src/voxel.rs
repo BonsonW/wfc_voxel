@@ -11,7 +11,7 @@ use super::{
     node::{Node, Sockets}
 };
 
-pub fn node_dict_from(asset_dir: &String, shape: [usize; 3], exclusions: &HashMap<&str, HashSet<&str>>) -> HashMap<usize, Node> {
+pub fn node_dict_from_directory(asset_dir: &String, shape: [usize; 3], exclusions: &HashMap<&str, HashSet<&str>>) -> HashMap<usize, Node> {
     let mut ret = HashMap::<usize, Node>::new();
 
     let mut side_socket_map = HashMap::<Array2<u8>, String>::new();
@@ -105,9 +105,9 @@ pub fn vox_array_from_xraw(path: &str) -> Array3<u8> {
     let bits_per_index = buffer[7];
     assert_eq!(bits_per_index, 8);
 
-    let width = as_u32_le(&buffer[8..12]) as usize;
-    let height = as_u32_le(&buffer[12..16]) as usize;
-    let depth = as_u32_le(&buffer[16..20]) as usize;
+    let width = usize_from_bits(&buffer[8..12]);
+    let height = usize_from_bits(&buffer[12..16]);
+    let depth = usize_from_bits(&buffer[16..20]);
 
     let data = &buffer[24..(24 + (width * height * depth) as usize)];
 
@@ -216,11 +216,11 @@ fn rotated_array_p90(arr: &Array2<u8>) -> Array2<u8> {
 }
 
 #[inline]
-fn as_u32_le(array: &[u8]) -> u32 {
-    ((array[0] as u32) <<  0) +
-    ((array[1] as u32) <<  8) +
-    ((array[2] as u32) << 16) +
-    ((array[3] as u32) << 24)
+fn usize_from_bits(array: &[u8]) -> usize {
+    ((array[0] as usize) <<  0) +
+    ((array[1] as usize) <<  8) +
+    ((array[2] as usize) << 16) +
+    ((array[3] as usize) << 24)
 }
 
 #[inline]
