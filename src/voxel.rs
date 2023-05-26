@@ -71,7 +71,7 @@ pub fn node_dict_from_directory(asset_dir: &String, shape: [usize; 3], exclusion
         node.valid_neighbors.ny.resize(node_map_cpy.len(), false);
         
         for (other_id, other_node) in &node_map_cpy {
-            if exclusions.contains((node.asset_name.as_str(), other_node.asset_name.as_str())) {
+            if exclusions.contains(&(node.asset_name.as_str(), other_node.asset_name.as_str())) {
                 continue;
             }
             if socket_matches(&node.sockets.px, &other_node.sockets.nx) { node.valid_neighbors.px.set(*other_id, true); }
