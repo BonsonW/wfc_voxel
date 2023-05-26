@@ -11,7 +11,7 @@ use super::{
     node::{Node, Sockets}
 };
 
-pub fn node_dict_from_directory(asset_dir: &String, shape: [usize; 3], exclusions: &HashMap<&str, HashSet<&str>>) -> HashMap<usize, Node> {
+pub fn node_dict_from_directory(asset_dir: &String, shape: [usize; 3], exclusions: &HashSet<(&str, &str)>) -> HashMap<usize, Node> {
     let mut ret = HashMap::<usize, Node>::new();
 
     let mut side_socket_map = HashMap::<Array2<u8>, String>::new();
@@ -71,10 +71,8 @@ pub fn node_dict_from_directory(asset_dir: &String, shape: [usize; 3], exclusion
         node.valid_neighbors.ny.resize(node_map_cpy.len(), false);
         
         for (other_id, other_node) in &node_map_cpy {
-            if let Some(st) = exclusions.get(node.asset_name.as_str()) {
-                if st.contains(other_node.asset_name.as_str()) {
-                    continue;
-                }
+            if exclusions.contains((node.asset_name.as_str(), other_node.asset_name.as_str())) {
+                continue;
             }
             if socket_matches(&node.sockets.px, &other_node.sockets.nx) { node.valid_neighbors.px.set(*other_id, true); }
             if socket_matches(&node.sockets.nx, &other_node.sockets.px) { node.valid_neighbors.nx.set(*other_id, true); }
