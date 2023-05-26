@@ -28,6 +28,22 @@ let solver = Solver::new([MAP_WIDTH, MAP_HEIGHT, MAP_WIDTH], node_data.bit_mask(
 
 // Get solved map
 let map = solver.solve().unwrap();
+
+// Dimensions of map
+let shape = solver.shape();
+
+for x in 0..shape[0] {
+    for y in 0..shape[1] {
+        for z in 0..shape[2] {
+        
+            // Get node id and asset name
+            let node_id = map[[x, y, z]];
+            let asset_name = node_data.get_asset_name(&node_id).unwrap();
+            
+            // Do something
+        }
+    }
+}
 ```
 
 ## Examples
