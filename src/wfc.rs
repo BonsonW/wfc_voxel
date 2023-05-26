@@ -4,7 +4,7 @@ use ndarray::Array3;
 use rand::Rng;
 use bitvec::prelude::*;
 
-use super::{node::Node, NodeData};
+use super::{node::Node, NodeSet};
 
 pub static POS_X: &'static [i32; 3] = &[1, 0, 0];
 pub static NEG_X: &'static [i32; 3] = &[-1, 0, 0];
@@ -40,11 +40,11 @@ impl Solver {
     /// Creates a new `Solver` given the `shape` of the map you want to generate.
     /// `init_val` is the value each cell is initialized with. Use the bit mask from your `NodeData` if unsure.
     #[inline]
-    pub fn new(shape: [usize; 3], init_val: &BitVec, node_data: &NodeData) -> Self {
+    pub fn new(shape: [usize; 3], init_val: &BitVec, node_set: &NodeSet) -> Self {
         Self {
             data: Array3::from_elem(shape, init_val.clone()),
             shape,
-            node_dict: node_data.node_dict().clone(),
+            node_dict: node_set.node_dict().clone(),
         }
     }
     

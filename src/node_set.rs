@@ -7,18 +7,18 @@ use super::node::Node;
 
 /// Contains mapping to all `Node`s and asset bit masks. `Node`s contain rules and metadata for each asset rotation.
 #[derive(Clone)]
-pub struct NodeData {
+pub struct NodeSet {
     node_dict: HashMap<usize, Node>,
     bit_mask: BitVec,
     asset_bits: HashMap<String, BitVec>,
 }
 
-impl NodeData {
+impl NodeSet {
     
-    /// Creates a new `NodeData` instance given the directory to all voxel files. A `Node` is generated for each voxel file rotation around the `Y` axis.
+    /// Creates a new `NodeSet` instance given the directory to all voxel files. A `Node` is generated for each voxel file rotation around the `Y` axis.
     /// `node_size` is the array length of each voxel file. This should be uniform across dimensions and voxel files.
     /// `exclusions` is the list of asset mappings that you don't want connected.
-    pub fn new(node_size: usize, directory: String, exclusions: HashSet<(&str, &str)>) -> NodeData {
+    pub fn new(node_size: usize, directory: String, exclusions: HashSet<(&str, &str)>) -> NodeSet {
         let node_dict = voxel::node_dict_from_directory(&directory, [node_size, node_size, node_size], &exclusions);
         
         let mut asset_bits = HashMap::new();
@@ -32,7 +32,7 @@ impl NodeData {
         
         bit_mask.fill(true);
 
-        NodeData {
+        NodeSet {
             node_dict,
             asset_bits,
             bit_mask,
