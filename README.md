@@ -20,11 +20,11 @@ Or add to your Cargo.toml:
 ## Usage
 
 ```rust
-// Initalize NodeData from directory
-let node_data = NodeData::new(NODE_SIZE, "path/to/voxel/files", exclusions);
+// Initalize NodeSet from directory
+let node_set = NodeSet::new(NODE_SIZE, "path/to/voxel/files", exclusions);
 
 // Initialize Solver
-let solver = Solver::new([MAP_WIDTH, MAP_HEIGHT, MAP_WIDTH], node_data.bit_mask(), &node_data);
+let solver = Solver::new([MAP_WIDTH, MAP_HEIGHT, MAP_WIDTH], node_set.bit_mask(), &node_set);
 
 // Get solved map
 let map = solver.solve().unwrap();
@@ -38,7 +38,7 @@ for x in 0..shape[0] {
         
             // Get node id and asset name
             let node_id = map[[x, y, z]];
-            let asset_name = node_data.get_asset_name(&node_id).unwrap();
+            let asset_name = node_set.get_asset_name(&node_id).unwrap();
             
             // Do something
         }
