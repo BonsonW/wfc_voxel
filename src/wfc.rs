@@ -23,7 +23,7 @@ pub static DIRECTIONS: &'static [[i32; 3]] = &[
 ];
 
 
-static OUT_OF_BOUNDS: [usize; 3] = [9999, 9999, 9999];
+static OUT_OF_BOUNDS: [usize; 3] = [usize::MAX, usize::MAX, usize::MAX];
 
 /// Solver for the Wave Function Collapse Algorithm.
 #[allow(dead_code)]
@@ -32,7 +32,6 @@ pub struct Solver {
     data: Array3<BitVec>,
     shape: [usize; 3],
     node_dict: HashMap<usize, Node>,
-    wrap: bool
 }
 
 #[allow(dead_code)]
@@ -40,14 +39,12 @@ impl Solver {
     
     /// Creates a new `Solver` given the `shape` of the map you want to generate.
     /// `init_val` is the value each cell is initialized with. Use the bit mask from your `NodeData` if unsure.
-    /// `wrap` determines if you want edge nodes to join with nodes on the opposite edge.
     #[inline]
-    pub fn new(shape: [usize; 3], init_val: &BitVec, node_data: &NodeData, wrap: bool) -> Self {
+    pub fn new(shape: [usize; 3], init_val: &BitVec, node_data: &NodeData) -> Self {
         Self {
             data: Array3::from_elem(shape, init_val.clone()),
             shape,
             node_dict: node_data.node_dict().clone(),
-            wrap
         }
     }
     
@@ -161,21 +158,12 @@ impl Solver {
         ret[1] += dir[1];
         ret[2] += dir[2];
 
-        if self.wrap {
-            if ret[0] >= shape[0] { ret[0] = 0; }
-            if ret[0] < 0         { ret[0] = shape[0] - 1; }
-            if ret[1] >= shape[1] { return OUT_OF_BOUNDS; }
-            if ret[1] < 0         { return OUT_OF_BOUNDS; }
-            if ret[2] >= shape[2] { ret[2] = 0; }
-            if ret[2] < 0         { ret[2] = shape[2] - 1; }
-        } else {
-            if ret[0] >= shape[0] { return OUT_OF_BOUNDS; }
-            if ret[0] < 0         { return OUT_OF_BOUNDS; }
-            if ret[1] >= shape[1] { return OUT_OF_BOUNDS; }
-            if ret[1] < 0         { return OUT_OF_BOUNDS; }
-            if ret[2] >= shape[2] { return OUT_OF_BOUNDS; }
-            if ret[2] < 0         { return OUT_OF_BOUNDS; }
-        }
+        if ret[0] >= shape[0] { return OUT_OF_BOUNDS; }
+        if ret[0] < 0         { return OUT_OF_BOUNDS; }
+        if ret[1] >= shape[1] { return OUT_OF_BOUNDS; }
+        if ret[1] < 0         { return OUT_OF_BOUNDS; }
+        if ret[2] >= shape[2] { return OUT_OF_BOUNDS; }
+        if ret[2] < 0         { return OUT_OF_BOUNDS; }
 
         ret.map(|e| e as usize)
     }

@@ -24,7 +24,7 @@ Or add to your Cargo.toml:
 let node_data = NodeData::new(NODE_SIZE, "path/to/voxel/files", exclusions);
 
 // Initialize Solver
-let solver = Solver::new([MAP_WIDTH, MAP_HEIGHT, MAP_WIDTH], node_data.bit_mask(), &node_data, false);
+let solver = Solver::new([MAP_WIDTH, MAP_HEIGHT, MAP_WIDTH], node_data.bit_mask(), &node_data);
 
 // Get solved map
 let map = solver.solve().unwrap();
