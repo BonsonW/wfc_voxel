@@ -6,20 +6,23 @@ use bitvec::prelude::*;
 
 use super::{node::Node, NodeSet};
 
-pub static POS_X: &'static [i32; 3] = &[1, 0, 0];
-pub static NEG_X: &'static [i32; 3] = &[-1, 0, 0];
-pub static POS_Y: &'static [i32; 3] = &[0, 1, 0];
-pub static NEG_Y: &'static [i32; 3] = &[0, -1, 0];
-pub static POS_Z: &'static [i32; 3] = &[0, 0, 1];
-pub static NEG_Z: &'static [i32; 3] = &[0, 0, -1];
+#[derive(Debug)]
+pub enum Direction {
+    POSX,
+    NEGX,
+    POSY,
+    NEGY,
+    POSZ,
+    NEGZ,
+}
 
-pub static DIRECTIONS: &'static [[i32; 3]] = &[
-    *POS_X,
-    *NEG_X,
-    *POS_Y,
-    *NEG_Y,
-    *POS_Z,
-    *NEG_Z,
+pub static DIRECTIONS: &'static [Direction] = &[
+    Direction::POSX,
+    Direction::NEGX,
+    Direction::POSY,
+    Direction::NEGY,
+    Direction::POSZ,
+    Direction::NEGZ,
 ];
 
 
@@ -150,13 +153,18 @@ impl Solver {
     }
 
     #[inline]
-    fn add_dir_to_pos(&self, pos: &[usize; 3], dir: &[i32; 3]) -> [usize; 3] {
+    fn add_dir_to_pos(&self, pos: &[usize; 3], dir: &Direction) -> [usize; 3] {
         let mut ret = pos.map(|e| e as i32);
         let shape = self.shape.map(|e| e as i32);
-
-        ret[0] += dir[0];
-        ret[1] += dir[1];
-        ret[2] += dir[2];
+        
+        match dir {
+            Direction::POSX => { ret[0] += 1 }
+            Direction::NEGX => { ret[0] -= 1 }
+            Direction::POSY => { ret[1] += 1 }
+            Direction::NEGY => { ret[1] -= 1 }
+            Direction::POSZ => { ret[2] += 1 }
+            Direction::NEGZ => { ret[2] -= 1 }
+        }
 
         if ret[0] >= shape[0] { return OUT_OF_BOUNDS; }
         if ret[0] < 0         { return OUT_OF_BOUNDS; }
@@ -192,40 +200,42 @@ impl Solver {
     }
 
     #[inline]
-    fn valid_neighbors(&self, pos: &[usize; 3], dir: &[i32; 3]) -> BitVec {
+    fn valid_neighbors(&self, pos: &[usize; 3], dir: &Direction) -> BitVec {
         let mut ret = BitVec::new();
         ret.resize(self.node_dict.len(), false);
 
         for id in self.options_at(pos).iter_ones() {
             let node = &self.node_dict[&id];
-
-            if      dir == POS_X { ret |= &node.valid_neighbors.px; }
-            else if dir == NEG_X { ret |= &node.valid_neighbors.nx; }
-            else if dir == POS_Y { ret |= &node.valid_neighbors.py; }
-            else if dir == NEG_Y { ret |= &node.valid_neighbors.ny; }
-            else if dir == POS_Z { ret |= &node.valid_neighbors.pz; }
-            else if dir == NEG_Z { ret |= &node.valid_neighbors.nz; }
-            else { panic!("{} {} {} is an invalid direction", dir[0], dir[1], dir[2]); }
+            
+            match dir {
+                Direction::POSX => { ret |= &node.valid_neighbors.px; }
+                Direction::NEGX => { ret |= &node.valid_neighbors.nx; }
+                Direction::POSY => { ret |= &node.valid_neighbors.py; }
+                Direction::NEGY => { ret |= &node.valid_neighbors.ny; }
+                Direction::POSZ => { ret |= &node.valid_neighbors.pz; }
+                Direction::NEGZ => { ret |= &node.valid_neighbors.nz; }
+            }
         }
 
         ret
     }
 
     #[inline]
-    fn valid_neighbors_of_set(&self, node_ids: &BitVec, dir: &[i32; 3]) -> BitVec {
+    fn valid_neighbors_of_set(&self, node_ids: &BitVec, dir: &Direction) -> BitVec {
         let mut ret = BitVec::new();
         ret.resize(self.node_dict.len(), false);
 
         for id in node_ids.iter_ones() {
             let node = &self.node_dict[&id];
-
-            if      dir == POS_X { ret |= &node.valid_neighbors.px; }
-            else if dir == NEG_X { ret |= &node.valid_neighbors.nx; }
-            else if dir == POS_Y { ret |= &node.valid_neighbors.py; }
-            else if dir == NEG_Y { ret |= &node.valid_neighbors.ny; }
-            else if dir == POS_Z { ret |= &node.valid_neighbors.pz; }
-            else if dir == NEG_Z { ret |= &node.valid_neighbors.nz; }
-            else { panic!("{} {} {} is an invalid direction", dir[0], dir[1], dir[2]); }
+            
+            match dir {
+                Direction::POSX => { ret |= &node.valid_neighbors.px; }
+                Direction::NEGX => { ret |= &node.valid_neighbors.nx; }
+                Direction::POSY => { ret |= &node.valid_neighbors.py; }
+                Direction::NEGY => { ret |= &node.valid_neighbors.ny; }
+                Direction::POSZ => { ret |= &node.valid_neighbors.pz; }
+                Direction::NEGZ => { ret |= &node.valid_neighbors.nz; }
+            }
         }
 
         ret
@@ -245,7 +255,7 @@ impl Solver {
     }
     
     /// Constrain the possible nodes at a specifc cell in the grid based on a set of neighbours you want for a specific direction.
-    pub fn force_neighbor(&mut self, pos: &[usize; 3], bits: &BitVec, dir: &[i32; 3]) {
+    pub fn force_neighbor(&mut self, pos: &[usize; 3], bits: &BitVec, dir: &Direction) {
         let valid_neighbors = self.valid_neighbors_of_set(bits, dir);
         
         for id in self.options_at(pos).iter_ones().collect::<Vec<usize>>() {

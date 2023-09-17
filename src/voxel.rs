@@ -7,9 +7,7 @@ use std::fs::File;
 
 use ndarray::{Array3, Array2, Axis, s};
 
-use super::{
-    node::{Node, Sockets}
-};
+use crate::node::{Node, Sockets};
 
 pub fn node_dict_from_directory(asset_dir: &String, shape: [usize; 3], exclusions: &HashSet<(&str, &str)>) -> HashMap<usize, Node> {
     let mut ret = HashMap::<usize, Node>::new();
