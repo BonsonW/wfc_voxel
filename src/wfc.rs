@@ -33,7 +33,8 @@ static OUT_OF_BOUNDS: [usize; 3] = [usize::MAX, usize::MAX, usize::MAX];
 #[derive(Clone)]
 pub struct Solver {
     data: Array3<BitVec>,
-    shape: [usize; 3],
+    ushape: [usize; 3],
+    ishape: [i32; 3],
     node_dict: HashMap<usize, Node>,
 }
 
@@ -43,10 +44,12 @@ impl Solver {
     /// Creates a new `Solver` given the `shape` of the map you want to generate.
     /// `init_val` is the value each cell is initialized with. Use the bit mask from your `NodeData` if unsure.
     #[inline]
-    pub fn new(shape: [usize; 3], init_val: &BitVec, node_set: &NodeSet) -> Self {
+    pub fn new(shape: [i32; 3], init_val: &BitVec, node_set: &NodeSet) -> Self {
+        let ushape = shape.map(|e| e as usize);
         Self {
-            data: Array3::from_elem(shape, init_val.clone()),
-            shape,
+            data: Array3::from_elem(ushape, init_val.clone()),
+            ushape,
+            ishape: shape,
             node_dict: node_set.node_dict().clone(),
         }
     }
@@ -54,7 +57,7 @@ impl Solver {
     /// Get the shape of the map.
     #[inline]
     pub fn shape(&self) -> &[usize; 3] {
-        &self.shape
+        &self.ushape
     }
 
     #[inline]
@@ -70,15 +73,15 @@ impl Solver {
     /// Automatically solves the current map state.
     /// Returns the solved map if successful. Returns `None` if not.
     pub fn solve(&mut self) -> Option<Array3<usize>> {
-        let mut ret = Array3::zeros(self.shape);
+        let mut ret = Array3::zeros(self.ushape);
 
         while !self.collapsed() {
             self.iterate();
         }
 
-        for x in 0..self.shape[0] {
-            for y in 0..self.shape[1] {
-                for z in 0..self.shape[2] {
+        for x in 0..self.ushape[0] {
+            for y in 0..self.ushape[1] {
+                for z in 0..self.ushape[2] {
                     if self.options_at(&[x, y, z]).not_any() {
                         // seed not solvable
                         return None;
@@ -94,9 +97,9 @@ impl Solver {
 
     #[inline]
     fn collapsed(&self) -> bool {
-        for x in 0..self.shape[0] {
-            for y in 0..self.shape[1] {
-                for z in 0..self.shape[2] {
+        for x in 0..self.ushape[0] {
+            for y in 0..self.ushape[1] {
+                for z in 0..self.ushape[2] {
                     if self.options_at(&[x, y, z]).count_ones() > 1 {
                         return false;
                     }
@@ -155,7 +158,6 @@ impl Solver {
     #[inline]
     fn add_dir_to_pos(&self, pos: &[usize; 3], dir: &Direction) -> [usize; 3] {
         let mut ret = pos.map(|e| e as i32);
-        let shape = self.shape.map(|e| e as i32);
         
         match dir {
             Direction::POSX => { ret[0] += 1 }
@@ -166,12 +168,12 @@ impl Solver {
             Direction::NEGZ => { ret[2] -= 1 }
         }
 
-        if ret[0] >= shape[0] { return OUT_OF_BOUNDS; }
-        if ret[0] < 0         { return OUT_OF_BOUNDS; }
-        if ret[1] >= shape[1] { return OUT_OF_BOUNDS; }
-        if ret[1] < 0         { return OUT_OF_BOUNDS; }
-        if ret[2] >= shape[2] { return OUT_OF_BOUNDS; }
-        if ret[2] < 0         { return OUT_OF_BOUNDS; }
+        if ret[0] >= self.ishape[0] { return OUT_OF_BOUNDS; }
+        if ret[0] < 0               { return OUT_OF_BOUNDS; }
+        if ret[1] >= self.ishape[1] { return OUT_OF_BOUNDS; }
+        if ret[1] < 0               { return OUT_OF_BOUNDS; }
+        if ret[2] >=self. ishape[2] { return OUT_OF_BOUNDS; }
+        if ret[2] < 0               { return OUT_OF_BOUNDS; }
 
         ret.map(|e| e as usize)
     }
@@ -181,9 +183,9 @@ impl Solver {
         let mut min_entropy = usize::MAX;
         let mut ret = [0, 0, 0];
 
-        for x in 0..self.shape[0] {
-            for y in 0..self.shape[1] {
-                for z in 0..self.shape[2] {
+        for x in 0..self.ushape[0] {
+            for y in 0..self.ushape[1] {
+                for z in 0..self.ushape[2] {
 
                     let cur_entropy = self.options_at(&[x, y, z]).count_ones();
 
