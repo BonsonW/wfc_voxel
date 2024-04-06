@@ -46,14 +46,14 @@ impl Solver {
     /// Creates a new random `Solver` given the `shape` of the map you want to generate.
     /// `init_val` is the value each cell is initialized with. Use the bit mask from your `NodeData` if unsure.
     #[inline]
-    pub fn new(shape: [i32; 3], init_val: &BitVec, node_set: &NodeSet) -> Self {
-        let ushape = shape.map(|e| e as usize);
+    pub fn new(shape: [usize; 3], init_val: &BitVec, node_set: &NodeSet) -> Self {
+        let ishape = shape.map(|e| e as i32);
         let mut thread_rng = thread_rng();
         let seed = thread_rng.next_u64();
         Self {
-            data: Array3::from_elem(ushape, init_val.clone()),
-            ushape,
-            ishape: shape,
+            data: Array3::from_elem(shape, init_val.clone()),
+            ushape: shape,
+            ishape,
             node_dict: node_set.node_dict().clone(),
             rng: StdRng::seed_from_u64(seed),
             seed
@@ -63,12 +63,12 @@ impl Solver {
     /// Creates a new `Solver` given a `seed` as u64 and the `shape` of the map you want to generate.
     /// `init_val` is the value each cell is initialized with. Use the bit mask from your `NodeData` if unsure.
     #[inline]
-    pub fn from_seed(shape: [i32; 3], init_val: &BitVec, node_set: &NodeSet, seed: &u64) -> Self {
-        let ushape = shape.map(|e| e as usize);
+    pub fn from_seed(shape: [usize; 3], init_val: &BitVec, node_set: &NodeSet, seed: &u64) -> Self {
+        let ishape = shape.map(|e| e as i32);
         Self {
-            data: Array3::from_elem(ushape, init_val.clone()),
-            ushape,
-            ishape: shape,
+            data: Array3::from_elem(shape, init_val.clone()),
+            ushape: shape,
+            ishape,
             node_dict: node_set.node_dict().clone(),
             rng: StdRng::seed_from_u64(*seed),
             seed: *seed
