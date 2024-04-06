@@ -37,7 +37,7 @@ pub struct Solver {
     ishape: [i32; 3],
     node_dict: HashMap<usize, Node>,
     rng: StdRng,
-    pub seed: u64,
+    seed: u64,
 }
 
 #[allow(dead_code)]
@@ -79,6 +79,12 @@ impl Solver {
     #[inline]
     pub fn shape(&self) -> &[usize; 3] {
         &self.ushape
+    }
+    
+    /// Get the seed of the solver.
+    #[inline]
+    pub fn seed(&self) -> &u64 {
+        &self.seed
     }
 
     #[inline]
