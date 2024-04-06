@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use ndarray::Array3;
-use rand::Rng;
+use rand::{rngs::StdRng, thread_rng, Rng, RngCore, SeedableRng};
 use bitvec::prelude::*;
 
 use super::{node::Node, NodeSet};
@@ -36,21 +36,42 @@ pub struct Solver {
     ushape: [usize; 3],
     ishape: [i32; 3],
     node_dict: HashMap<usize, Node>,
+    rng: StdRng,
+    seed: u64,
 }
 
 #[allow(dead_code)]
 impl Solver {
     
-    /// Creates a new `Solver` given the `shape` of the map you want to generate.
+    /// Creates a new random `Solver` given the `shape` of the map you want to generate.
     /// `init_val` is the value each cell is initialized with. Use the bit mask from your `NodeData` if unsure.
     #[inline]
     pub fn new(shape: [i32; 3], init_val: &BitVec, node_set: &NodeSet) -> Self {
+        let ushape = shape.map(|e| e as usize);
+        let mut thread_rng = thread_rng();
+        let seed = thread_rng.next_u64();
+        Self {
+            data: Array3::from_elem(ushape, init_val.clone()),
+            ushape,
+            ishape: shape,
+            node_dict: node_set.node_dict().clone(),
+            rng: StdRng::seed_from_u64(seed),
+            seed
+        }
+    }
+    
+    /// Creates a new `Solver` given a `seed` as u64 and the `shape` of the map you want to generate.
+    /// `init_val` is the value each cell is initialized with. Use the bit mask from your `NodeData` if unsure.
+    #[inline]
+    pub fn from_seed(shape: [i32; 3], init_val: &BitVec, node_set: &NodeSet, seed: &u64) -> Self {
         let ushape = shape.map(|e| e as usize);
         Self {
             data: Array3::from_elem(ushape, init_val.clone()),
             ushape,
             ishape: shape,
             node_dict: node_set.node_dict().clone(),
+            rng: StdRng::seed_from_u64(*seed),
+            seed: *seed
         }
     }
     
@@ -118,10 +139,8 @@ impl Solver {
     }
     
     fn collapse_at(&mut self, pos: &[usize; 3]) {
-        let mut rng = rand::thread_rng();
-
         let options = self.options_at(pos).iter_ones().collect::<Vec<usize>>();
-        let to = options[rng.gen_range(0..options.len())];
+        let to = options[self.rng.gen_range(0..options.len())];
 
         self.options_at_mut(pos).set_elements(0);
         self.options_at_mut(pos).set(to, true);
