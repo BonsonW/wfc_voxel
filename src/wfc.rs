@@ -37,7 +37,7 @@ pub struct Solver {
     ishape: [i32; 3],
     node_dict: HashMap<usize, Node>,
     rng: StdRng,
-    seed: u64,
+    pub seed: u64,
 }
 
 #[allow(dead_code)]
