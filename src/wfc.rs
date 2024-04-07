@@ -91,6 +91,7 @@ impl Solver {
     #[inline]
     pub fn set_seed(&mut self, seed: &u64) {
         self.rng = StdRng::seed_from_u64(*seed);
+        self.seed = *seed;
     }
 
     #[inline]
