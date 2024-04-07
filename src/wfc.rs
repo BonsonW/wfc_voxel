@@ -86,6 +86,12 @@ impl Solver {
     pub fn seed(&self) -> &u64 {
         &self.seed
     }
+    
+    /// Set the seed of the solver.
+    #[inline]
+    pub fn set_seed(&mut self, seed: &u64) {
+        self.rng = StdRng::seed_from_u64(*seed);
+    }
 
     #[inline]
     fn options_at(&self, pos: &[usize; 3]) -> &BitVec {
